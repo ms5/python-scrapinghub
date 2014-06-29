@@ -178,6 +178,17 @@ class RequestProxyMixin(object):
         return self._request_proxy._post(method, format, params, headers, raw, files)
 
 
+class Spider(dict):
+    def __init__(self,*arg,**kw):
+        super(Spider, self).__init__(*arg, **kw)
+
+    def __getattr__(self, item):
+        try:
+            return self.__getitem__(item)
+        except KeyError:
+            raise AttributeError(item)
+
+
 class Project(RequestProxyMixin):
     def __init__(self, connection, projectid):
         self.connection = connection
@@ -205,7 +216,7 @@ class Project(RequestProxyMixin):
 
     def spiders(self, **params):
         result = self._get('spiders', 'json', params)
-        return result['spiders']
+        return [Spider(spider) for spider in result['spiders']]
 
     @property
     def _request_proxy(self):
