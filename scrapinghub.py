@@ -314,6 +314,12 @@ class Job(RequestProxyMixin):
     def __repr__(self):
         return "Job({0.project!r}, {0.id})".format(self)
 
+    def __getattr__(self, item):
+        try:
+            return self.__dict__['info'][item]
+        except KeyError:
+            raise AttributeError(item)
+
     def items(self, offset=0, count=None, meta=None):
         import requests
         params = {'offset': offset}
